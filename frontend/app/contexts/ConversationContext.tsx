@@ -186,7 +186,7 @@ export function ConversationProvider({ children }: { children: ReactNode }) {
     setError(null)
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/conversation/all`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/conversation/all`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
