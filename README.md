@@ -1,6 +1,6 @@
 # english-app-ver2
 
-## Hướng dẫn dành cho dev mới
+## Hướng dẫn chạy project local
 
 ### 1. Clone repository từ GitHub
 
