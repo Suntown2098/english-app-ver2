@@ -19,9 +19,14 @@ export default function Home() {
   // Handle navigation when user state changes
   useEffect(() => {
     if (user) {
-      router.push("/chat")
+      router.push("/view")
     }
   }, [user, router])
+
+  // Reset error when switching tabs
+  useEffect(() => {
+    setFormError("");
+  }, [isLogin])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -52,7 +57,7 @@ export default function Home() {
     <div className="min-h-screen flex flex-col items-center justify-center bg-flappy-bg bg-cover bg-center p-4">
       <div className="w-full max-w-md">
         <div className="mb-8 flex flex-col items-center">
-          <Image src="/images/flappy-bird-logo.png" alt="Flappy English" width={200} height={100} className="mb-4" />
+          <Image src="/ab.webp" alt="Flappy English" width={200} height={100} className="mb-4" />
           <h1 className="text-3xl flappy-text text-center text-primary-foreground">Flappy English</h1>
           <p className="mt-2 text-center text-white flappy-text text-sm">Practice English with AI</p>
         </div>

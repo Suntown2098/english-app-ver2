@@ -7,6 +7,10 @@ type HistoryPanelProps = {
   onClose: () => void
 }
 
+// HistoryPanel.tsx
+// Panel trượt phải hiển thị lịch sử hội thoại, cho phép chọn lại hội thoại cũ.
+// Lấy dữ liệu từ context, hiển thị loading, đóng/mở panel.
+
 export default function HistoryPanel({ isOpen, onClose }: HistoryPanelProps) {
   const { conversations, loadConversation, isLoading } = useConversation()
 
@@ -22,12 +26,14 @@ export default function HistoryPanel({ isOpen, onClose }: HistoryPanelProps) {
     })
   }
 
+  // Khi click vào nút History trong Sidebar thì hiển thị lịch sử hội thoại
   const handleConversationClick = (conversationId: string) => {
     loadConversation(conversationId)
     onClose()
   }
 
   return (
+    // Collapse Panel bên phải, hiển thị danh sách hội thoại, nút đóng
     <div
       className={`fixed inset-y-0 right-0 w-80 bg-white shadow-lg transform transition-transform duration-300 ease-in-out z-20 ${
         isOpen ? "translate-x-0" : "translate-x-full"

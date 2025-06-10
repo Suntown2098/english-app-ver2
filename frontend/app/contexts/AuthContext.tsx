@@ -21,14 +21,21 @@ type AuthContextType = {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
+// AuthContext.tsx
+// Context quản lý xác thực người dùng: đăng nhập, đăng ký, đăng xuất, lưu user vào cookie, kiểm tra trạng thái đăng nhập.
+// Cung cấp các hàm login, signup, logout, trạng thái user, loading, error cho toàn app.
+
 export function AuthProvider({ children }: { children: ReactNode }) {
+  // user: thông tin người dùng hiện tại
+  // isLoading: trạng thái loading khi xác thực
+  // error: thông báo lỗi xác thực
   const [user, setUser] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const router = useRouter()
 
   useEffect(() => {
-    // Check if user is already logged in
+    // Khi load app, kiểm tra user đã đăng nhập chưa (lưu trong cookie)
     const storedUser = Cookies.get("user")
     if (storedUser) {
       try {
@@ -40,6 +47,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setIsLoading(false)
   }, [])
 
+  // Hàm đăng nhập
   const login = async (username: string, password: string) => {
     setIsLoading(true)
     setError(null)
@@ -74,6 +82,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }
 
+  // Hàm đăng ký
   const signup = async (username: string, password: string) => {
     setIsLoading(true)
     setError(null)
@@ -108,6 +117,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }
 
+  // Hàm đăng xuất
   const logout = () => {
     Cookies.remove("user")
     setUser(null)
@@ -119,6 +129,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   )
 }
 
+// Hook sử dụng AuthContext trong các component
 export function useAuth() {
   const context = useContext(AuthContext)
   if (context === undefined) {

@@ -1,3 +1,7 @@
+// SettingsModal.tsx
+// Modal cài đặt tài khoản: đổi tên hiển thị, đổi mật khẩu, hiển thị thông báo.
+// Quản lý trạng thái form, loading, lỗi/thành công.
+
 "use client"
 
 import type React from "react"
@@ -21,6 +25,7 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
   const [success, setSuccess] = useState("")
   const [isLoading, setIsLoading] = useState(false)
 
+  // Xử lý đổi tên hiển thị
   const handleUpdateDisplayName = async (e: React.FormEvent) => {
     e.preventDefault()
     setError("")
@@ -45,6 +50,7 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
     }
   }
 
+  // Xử lý đổi mật khẩu
   const handleUpdatePassword = async (e: React.FormEvent) => {
     e.preventDefault()
     setError("")

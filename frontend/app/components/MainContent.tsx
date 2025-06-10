@@ -1,17 +1,26 @@
 "use client"
 
 import type React from "react"
-
+import { v4 as uuidv4 } from "uuid"
 import { useState, useRef, useEffect } from "react"
 import { useConversation } from "../contexts/ConversationContext"
 import { Mic, Send, StopCircle } from "lucide-react"
 import MessageList from "./MessageList"
+import type { Message } from "../contexts/ConversationContext"
+import { blobToBase64, base64ToBlob } from "../lib/utils"
+
+// MainContent.tsx
+// Vùng hiển thị nội dung chat chính: nhập/gửi tin nhắn, ghi âm, hiển thị hội thoại.
+// Quản lý trạng thái nhập liệu, ghi âm, gửi tin nhắn qua context.
 
 export default function MainContent() {
-  const [message, setMessage] = useState("")
+  // messageText: nội dung tin nhắn đang nhập
+  const [messageText, setMessageText] = useState("")
+  // isRecording: trạng thái ghi âm
   const [isRecording, setIsRecording] = useState(false)
+  // recordingTime: thời gian ghi âm
   const [recordingTime, setRecordingTime] = useState(0)
-  const { sendTextMessage, sendVoiceRecording, currentConversationMessages, isLoading } = useConversation()
+  const { sendTextMessage, transcribeAudio, currentConversationMessages, isLoading } = useConversation()
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null)
   const audioChunksRef = useRef<Blob[]>([])
@@ -23,14 +32,29 @@ export default function MainContent() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
   }, [currentConversationMessages])
 
+  // Khi gửi tin nhắn văn bản
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault()
-    if (message.trim() && !isLoading) {
-      sendTextMessage(message.trim())
-      setMessage("")
+    
+    if (messageText.trim() && !isLoading) {
+      // Set message with new ID and timestamp
+      const newMessage: Message = {
+        id: uuidv4(),
+        role: "user",
+        content: messageText.trim(),
+        audio: "",
+        create_time: new Date().toISOString()
+      }
+
+      // Send the message
+      sendTextMessage(newMessage)
+      
+      // Reset message text
+      setMessageText("")
     }
   }
 
+  // Bắt đầu ghi âm
   const startRecording = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
@@ -52,12 +76,13 @@ export default function MainContent() {
       setRecordingTime(0)
       timerRef.current = setInterval(() => {
         setRecordingTime((prev) => prev + 1)
-      }, 1000)
+      }, 300)
     } catch (err) {
       console.error("Error accessing microphone:", err)
     }
   }
 
+  // Kết thúc ghi âm, gửi audio lên server để chuyển thành text
   const stopRecording = () => {
     if (mediaRecorderRef.current && isRecording) {
       mediaRecorderRef.current.stop()
@@ -74,9 +99,19 @@ export default function MainContent() {
       setIsRecording(false)
 
       // Process recording after a short delay to ensure all data is collected
-      setTimeout(() => {
+      setTimeout(async () => {
         if (audioChunksRef.current.length > 0) {
-          sendVoiceRecording(audioChunksRef.current)
+          const mergedBlob = new Blob(audioChunksRef.current, { type: 'audio/wav' })
+          const audioBase64 = await blobToBase64(mergedBlob)
+          const text = await transcribeAudio(audioChunksRef.current)
+          const newMessage: Message = {
+            id: uuidv4(),
+            role: "user",
+            content: text,
+            audio: audioBase64,
+            create_time: new Date().toISOString()
+          }
+          sendTextMessage(newMessage)
           audioChunksRef.current = []
         }
       }, 200)
@@ -90,6 +125,7 @@ export default function MainContent() {
   }
 
   return (
+    // Bố cục gồm vùng hiển thị tin nhắn và form nhập/gửi/ghi âm
     <div className="flex-1 flex flex-col h-full">
       <div className="flex-1 overflow-y-auto p-4">
         <MessageList messages={currentConversationMessages} />
@@ -107,8 +143,8 @@ export default function MainContent() {
 
           <input
             type="text"
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
+            value={messageText}
+            onChange={(e) => setMessageText(e.target.value)}
             placeholder="Type your message..."
             className="flappy-input flex-1 mr-2"
             disabled={isRecording || isLoading}
@@ -137,7 +173,7 @@ export default function MainContent() {
           <button
             type="submit"
             className="p-2 rounded-full bg-primary text-white hover:bg-green-600 transition-colors"
-            disabled={!message.trim() || isLoading || isRecording}
+            disabled={!messageText.trim() || isLoading || isRecording}
           >
             <Send className="h-6 w-6" />
           </button>

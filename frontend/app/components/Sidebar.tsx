@@ -1,3 +1,7 @@
+// Sidebar.tsx
+// Thanh điều hướng bên trái: tạo hội thoại mới, xem lịch sử, mở cài đặt, đăng xuất.
+// Hiển thị tên người dùng, responsive, quản lý trạng thái modal cài đặt.
+
 "use client"
 
 import { useState } from "react"
@@ -15,11 +19,13 @@ export default function Sidebar({ onToggleHistory }: SidebarProps) {
   const { startNewConversation } = useConversation()
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
 
+  // Khi bấm nút tạo hội thoại mới
   const handleNewConversation = () => {
     startNewConversation()
   }
 
   return (
+    // Bố cục sidebar với các nút chức năng và modal cài đặt
     <div className="w-16 md:w-64 bg-white border-r border-gray-300 flex flex-col h-full">
       <div className="p-4 border-b border-gray-300">
         <h1 className="text-lg flappy-text text-primary hidden md:block">Flappy English</h1>

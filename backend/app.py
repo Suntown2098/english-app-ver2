@@ -1,3 +1,6 @@
+import eventlet
+eventlet.monkey_patch()
+
 from flask import Flask, request, jsonify
 from flask_socketio import SocketIO, emit
 from flask_cors import CORS
@@ -20,7 +23,8 @@ load_dotenv()
 # Initialize Flask app
 app = Flask(__name__)
 CORS(app)
-socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading')
+# socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading')
+socketio = SocketIO(app, cors_allowed_origins="*", async_mode='eventlet')
 
 # Configure OpenAI
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
@@ -167,12 +171,17 @@ def transcribe():
     if not user_id:
         return jsonify({'message': 'Invalid or expired token'}), 401
     
-    # Process audio chunks
+    # # Get base64 audio data from request
+    # data = request.json
+    # base64_audio = data.get('audio')
+    # if not base64_audio:
+    #     return jsonify({'message': 'No audio data provided'}), 400
+
     audio_chunks = []
     for key, file in request.files.items():
         if key.startswith('chunk_'):
             audio_chunks.append(file.read())
-    
+
     if not audio_chunks:
         return jsonify({'message': 'No audio data provided'}), 400
     
@@ -185,20 +194,28 @@ def transcribe():
         temp_file_path = temp_file.name
     
     try:
+        # Decode base64 to binary
+        # audio_data = base64.b64decode(base64_audio)
+        
+        # Create temporary file for the audio
+        # with tempfile.NamedTemporaryFile(suffix='.webm', delete=False) as temp_file:
+        #     temp_file.write(audio_data)
+        #     temp_file_path = temp_file.name
+        
         # Convert to WAV using pydub
         audio = AudioSegment.from_file(temp_file_path)
         wav_io = io.BytesIO()
         audio.export(wav_io, format='wav')
         wav_io.seek(0)
+        wav_io.name = "audio.wav"
         
         # Transcribe using OpenAI Whisper
-        transcript = client.audio.transcribe(
-            "whisper-1",
-            wav_io,
-            language="en"
+        transcript = client.audio.transcriptions.create(
+            model="whisper-1",
+            file=wav_io
         )
         
-        return jsonify({'text': transcript['text']}), 200
+        return jsonify({'text': transcript.text}), 200
     except Exception as e:
         return jsonify({'message': f'Error transcribing audio: {str(e)}'}), 500
     finally:
@@ -294,8 +311,9 @@ def process_conversation():
             input=full_response
         )
         
-        # Get audio data
+        # Get audio data and encode as base64
         audio_data = audio_response.content
+        audio_base64 = base64.b64encode(audio_data).decode('utf-8')
         
         # Save complete AI message to database
         conn = get_db_connection()
@@ -303,13 +321,12 @@ def process_conversation():
         
         cursor.execute('''
         INSERT INTO messages (id, conversationid, role, content, audio, create_time)
-        VALUES (?, ?, ?, ?, ?, ?)
-        ''', (
+        VALUES (?, ?, ?, ?, ?, ?)''', (
             ai_message_id,
             conversation_id,
             'assistant',
             full_response,
-            audio_data,
+            audio_base64,  # store as base64 string
             timestamp
         ))
         
@@ -323,7 +340,7 @@ def process_conversation():
                 'id': ai_message_id,
                 'role': 'assistant',
                 'content': full_response,
-                'audio': base64.b64encode(audio_data).decode('utf-8'),
+                'audio': audio_base64,  # send as base64 string
                 'create_time': timestamp
             }]
         }, namespace='/')
@@ -381,9 +398,9 @@ def get_conversation(conversation_id):
             'create_time': message['create_time']
         }
         
-        # Add audio if available
+        # Add audio if available (already base64 string)
         if message['audio']:
-            msg_data['audio'] = base64.b64encode(message['audio']).decode('utf-8')
+            msg_data['audio'] = message['audio']
         
         formatted_messages.append(msg_data)
     
@@ -432,6 +449,6 @@ def get_all_conversations():
     }), 200
     
 if __name__ == '__main__':
-    socketio.run(app, debug=True, allow_unsafe_werkzeug=True)
+    socketio.run(app, debug=True, host="0.0.0.0", port=5000)
     
     
