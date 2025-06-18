@@ -80,7 +80,7 @@ export default function TranscriptionView() {
     if (!text.trim()) return;
       setHighlightTranslation("translating...");
       try {
-        const apiKey = "AIzaSyCml_EpUm9LeR1Y2aa6XLml_sAxqIvuSdE"; 
+        const apiKey = process.env.NEXT_PUBLIC_GOOGLE_API_KEY;
         const url = `https://translation.googleapis.com/language/translate/v2?key=${apiKey}`;
         const res = await fetch(url, {
           method: "POST",
@@ -164,7 +164,7 @@ export default function TranscriptionView() {
               {/* User (right) */}
               {isUser && (
                 <div className="ml-2 flex-shrink-0">
-                  <span className="w-8 h-8 flex items-center justify-center text-xl">🔥</span>
+                  <span className="w-8 h-8 flex items-center justify-center text-xl">🦉</span>
                 </div>
               )}
             </div>
