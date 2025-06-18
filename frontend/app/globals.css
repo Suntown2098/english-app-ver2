@@ -3,108 +3,34 @@
 @tailwind utilities;
 
 :root {
-  --background: 210 40% 96.1%;
-  --foreground: 222.2 84% 4.9%;
-  --card: 0 0% 100%;
-  --card-foreground: 222.2 84% 4.9%;
-  --popover: 0 0% 100%;
-  --popover-foreground: 222.2 84% 4.9%;
-  --primary: 142.1 76.2% 63.1%;
-  --primary-foreground: 210 40% 98%;
-  --secondary: 210 40% 96.1%;
-  --secondary-foreground: 222.2 47.4% 11.2%;
-  --muted: 210 40% 96.1%;
-  --muted-foreground: 215.4 16.3% 46.9%;
-  --accent: 210 40% 96.1%;
-  --accent-foreground: 222.2 47.4% 11.2%;
-  --destructive: 0 84.2% 60.2%;
-  --destructive-foreground: 210 40% 98%;
-  --border: 214.3 31.8% 91.4%;
-  --input: 214.3 31.8% 91.4%;
-  --ring: 142.1 76.2% 63.1%;
-  --radius: 0.5rem;
+  --lk-va-bar-width: 72px;
+  --lk-control-bar-height: unset;
 }
 
-.dark {
-  --background: 222.2 84% 4.9%;
-  --foreground: 210 40% 98%;
-  --card: 222.2 84% 4.9%;
-  --card-foreground: 210 40% 98%;
-  --popover: 222.2 84% 4.9%;
-  --popover-foreground: 210 40% 98%;
-  --primary: 142.1 70.6% 45.3%;
-  --primary-foreground: 144.9 80.4% 10%;
-  --secondary: 217.2 32.6% 17.5%;
-  --secondary-foreground: 210 40% 98%;
-  --muted: 217.2 32.6% 17.5%;
-  --muted-foreground: 215 20.2% 65.1%;
-  --accent: 217.2 32.6% 17.5%;
-  --accent-foreground: 210 40% 98%;
-  --destructive: 0 62.8% 30.6%;
-  --destructive-foreground: 210 40% 98%;
-  --border: 217.2 32.6% 17.5%;
-  --input: 217.2 32.6% 17.5%;
-  --ring: 142.1 76.2% 63.1%;
+.agent-visualizer > .lk-audio-bar {
+  width: 72px;
 }
 
-body {
-  @apply bg-background text-foreground;
-  font-feature-settings: "rlig" 1, "calt" 1;
+.lk-agent-control-bar {
+  @apply border-t-0 p-0 h-min mr-4;
+  content: '🎤';
+  font-size: 1.7em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.flappy-button {
-  @apply bg-primary text-primary-foreground font-mono py-2 px-4 rounded-md border-b-4 border-green-700 hover:border-b-2 hover:mt-0.5 transition-all duration-100 active:bg-green-600;
-  font-family: "Courier New", monospace;
-  font-weight: bold;
-  text-transform: uppercase;
-  letter-spacing: 1px;
+.lk-disconnect-button {
+  @apply h-[36px] hover:bg-[#6b221a] hover:text-[white] bg-[#31100c] border-[#6b221a];
 }
 
-.flappy-input {
-  @apply bg-white border-2 border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary;
+/* Hide the microphone input dropdown in the control bar */
+.lk-media-device-select {
+  display: none !important;
 }
 
-.flappy-card {
-  @apply bg-white rounded-lg border-2 border-gray-300 shadow-md p-6;
+/* Replace the default microphone icon with a cartoon emoji */
+.lk-microphone-toggle-button svg {
+  display: none !important;
 }
 
-.flappy-panel {
-  @apply bg-white rounded-lg border-2 border-gray-300 shadow-md;
-}
-
-.message-bubble {
-  @apply rounded-lg p-3 mb-2;
-  max-width: 80%;
-}
-
-.user-message {
-  @apply message-bubble bg-primary text-primary-foreground ml-auto;
-}
-
-.ai-message {
-  @apply message-bubble bg-muted text-foreground mr-auto;
-}
-
-.pixel-corners {
-  clip-path: polygon(
-    0px 4px,
-    4px 4px,
-    4px 0px,
-    calc(100% - 4px) 0px,
-    calc(100% - 4px) 4px,
-    100% 4px,
-    100% calc(100% - 4px),
-    calc(100% - 4px) calc(100% - 4px),
-    calc(100% - 4px) 100%,
-    4px 100%,
-    4px calc(100% - 4px),
-    0px calc(100% - 4px)
-  );
-}
-
-.flappy-text {
-  font-family: "Courier New", monospace;
-  font-weight: bold;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}

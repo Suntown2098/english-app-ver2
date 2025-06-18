@@ -1,24 +1,25 @@
-import type React from "react"
-import "./globals.css"
-import type { Metadata } from "next"
-import { AuthProvider } from "./contexts/AuthContext"
+import "@livekit/components-styles";
+import { Metadata } from "next";
+import { Public_Sans } from "next/font/google";
+import "./globals.css";
+
+const publicSans400 = Public_Sans({
+  weight: "400",
+  subsets: ["latin"],
+});
 
 export const metadata: Metadata = {
-  title: "Flappy English - Practice English with AI",
-  description: "Improve your English speaking skills with AI-powered conversations",
-    generator: 'v0.dev'
-}
+  title: "Voice Assistant",
+};
 
 export default function RootLayout({
   children,
-}: {
-  children: React.ReactNode
-}) {
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
   return (
-    <html lang="en">
-      <body>
-        <AuthProvider>{children}</AuthProvider>
-      </body>
+    <html lang="en" className={`h-full ${publicSans400.className}`}>
+      <body className="h-full">{children}</body>
     </html>
-  )
+  );
 }
