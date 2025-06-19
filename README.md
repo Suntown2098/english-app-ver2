@@ -44,23 +44,25 @@ source .venv/bin/activate
 ### 4. Install Dependencies
 ```bash
 python -m pip install --upgrade pip
-pip install -r requirements.txt
+pip install livekit-agents[groq,silero,openai,deepgram,turn-detector]~=1.0rc
+pip install python-dotenv
 ```
 
 ### 5. Environment Variables
-Create a `.env` file in the `backend/` directory with the following variables:
+Create a `.env.local` file in the `backend/` directory with the following variables:
 
 ```env
 LIVEKIT_URL=your_livekit_url
 LIVEKIT_API_KEY=your_livekit_api_key
 LIVEKIT_API_SECRET=your_livekit_api_secret
-GROQ_API_KEY=your_groq_api_key
+GROQ_API_KEY=your_groq_api_key (ko cần)
 GOOGLE_API_KEY=your_google_translate_api_key
 ```
 
 ### 6. Run Backend Server
 ```bash
-python app.py
+python assistant.py download-files
+python assistant.py start
 ```
 
 The backend server will start on `http://localhost:5000`
@@ -75,6 +77,8 @@ cd frontend
 ### 2. Install Dependencies
 ```bash
 pnpm install
+or
+npm install
 ```
 
 ### 3. Environment Variables
@@ -84,11 +88,14 @@ Create a `.env.local` file in the `frontend/` directory:
 NEXT_PUBLIC_GOOGLE_API_KEY=your_google_translate_api_key
 NEXT_PUBLIC_LIVEKIT_URL=your_livekit_url
 NEXT_PUBLIC_LIVEKIT_API_KEY=your_livekit_api_key
+GOOGLE_TRANSLATE_API_KEY=your_gg_transalte_api_key
 ```
 
 ### 4. Run Frontend Development Server
 ```bash
 pnpm dev
+or
+npm run dev
 ```
 
 The frontend application will start on `http://localhost:3000`
@@ -157,8 +164,8 @@ concurrently "cd backend && .venv\\Scripts\\activate && python app.py" "cd front
    - Sign up at [LiveKit Cloud](https://cloud.livekit.io/)
    - Get URL, API Key, and API Secret
 
-2. **Groq** - For AI conversation processing
-   - Sign up at [Groq](https://console.groq.com/)
+2. **OpenAI** - For AI conversation processing
+   - Sign up at OpenAI API platform
    - Get API key
 
 3. **Google Translate** - For text translation
